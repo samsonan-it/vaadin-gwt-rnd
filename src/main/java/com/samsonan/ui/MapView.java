@@ -87,7 +87,7 @@ public class MapView extends VerticalLayout implements View {
         Button save = new Button("Save", VaadinIcons.CHECK);
         Button delete = new Button("Delete", VaadinIcons.TRASH);    
 
-        type.setItems("Magic","Tech");
+        type.setItems("Type A","Type B");
         
         CssLayout actions = new CssLayout(save, delete);        
 

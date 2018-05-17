@@ -47,7 +47,6 @@ public class RunesForm extends VerticalLayout {
     // TODO: i18n
     private TextField name = new TextField("Название");
     private TextField latinName = new TextField("Лат. название");
-    private TextField pointOrder = new TextField("Порядок точек");
     private ComboBox<Effect> effects = new ComboBox<Effect>("Эффект");    
     private TextField effectVal = new TextField("Значение эффекта");
     
@@ -74,11 +73,10 @@ public class RunesForm extends VerticalLayout {
             effectVal.setVisible(event.getSelectedItem().isPresent());
         });
                 
-        addComponents(name, latinName, pointOrder, effects, effectVal, actions);
+        addComponents(name, latinName, effects, effectVal, actions);
 
         binder.bind(name, Rune::getName, Rune::setName);    
         binder.bind(latinName, Rune::getLatinName, Rune::setLatinName);    
-        binder.bind(pointOrder, Rune::getPointOrder, Rune::setPointOrder);    
         binder.bind(effects, Rune::getEffect, Rune::setEffect);
         binder.bind(effectVal, Rune::getEffectValStr, Rune::setEffectValStr);    
         

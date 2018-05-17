@@ -57,7 +57,7 @@ public class RunesView extends VerticalLayout implements View {
         grid.setHeight(300, Unit.PIXELS);
         grid.setWidth(100, Unit.PERCENTAGE);
 
-        grid.setColumns("id", "name", "latinName", "pointOrder");
+        grid.setColumns("id", "name", "latinName");
 
         grid.addColumn(e -> {
             Effect effect = e.getEffect();

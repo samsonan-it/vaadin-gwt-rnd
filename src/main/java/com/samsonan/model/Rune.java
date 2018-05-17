@@ -21,9 +21,6 @@ public class Rune {
     @Column(name="LATIN_NAME")
     private String latinName;
 
-    @Column(name="POINT_ORDER")
-    private String pointOrder;
-
     @ManyToOne
     @JoinColumn(name="EFFECT_ID")    
     private Effect effect;
@@ -55,14 +52,6 @@ public class Rune {
 
     public void setLatinName(String latinName) {
         this.latinName = latinName;
-    }
-
-    public String getPointOrder() {
-        return pointOrder;
-    }
-
-    public void setPointOrder(String pointOrder) {
-        this.pointOrder = pointOrder;
     }
 
     public Effect getEffect() {

@@ -17,7 +17,6 @@ CREATE TABLE RUNE
   ID int PRIMARY KEY auto_increment,
   NAME varchar(255) NOT NULL,
   LATIN_NAME varchar(255) NOT NULL,
-  POINT_ORDER varchar(16) NOT NULL,
   EFFECT_ID int,
   EFFECT_VAL int,
   foreign key (EFFECT_ID) references EFFECT (ID)
