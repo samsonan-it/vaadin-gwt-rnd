@@ -1,18 +1,15 @@
 package com.samsonan.ui;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.spring.events.EventBus;
 
 import com.samsonan.model.Effect;
-import com.samsonan.model.Element;
 import com.samsonan.model.Rune;
 import com.samsonan.repository.EffectRepository;
 import com.samsonan.repository.RuneRepository;
-import com.samsonan.ui.EffectEditor.ChangeHandler;
 import com.vaadin.data.BeanValidationBinder;
 import com.vaadin.data.Binder;
 import com.vaadin.event.ShortcutAction;
@@ -27,21 +24,21 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * Using pure vaadin (No viritin) and spring-vaadin event bus to de-couple Grid View and the Form
+ */
 @SpringComponent
 @UIScope
-public class RunesEditor extends VerticalLayout {
+public class RunesForm extends VerticalLayout {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3124506745817456455L;
-
-    private static final Logger log = LoggerFactory.getLogger(RunesEditor.class);
+    private static final Logger log = LoggerFactory.getLogger(RunesForm.class);
     
     private final RuneRepository runeRepo;    
     private final EffectRepository effectRepo;    
-    
+    private final EventBus.UIEventBus eventBus;
 
+    
     /**
      * The currently edited rune
      */
@@ -58,17 +55,18 @@ public class RunesEditor extends VerticalLayout {
     private Button save = new Button("Save", VaadinIcons.CHECK);
     private Button delete = new Button("Delete", VaadinIcons.TRASH);    
 
-    private CssLayout actions = new CssLayout(save, /*cancel,*/ delete);
+    private CssLayout actions = new CssLayout(save, delete);
 
     private Binder<Rune> binder = new BeanValidationBinder<>(Rune.class);    
 
     @Autowired
-    public RunesEditor(RuneRepository runeRepo, EffectRepository effectRepo) {
+    public RunesForm(RuneRepository runeRepo, EffectRepository effectRepo, EventBus.UIEventBus b) {
         
         log.debug("RunesEditor :: constructor");
         
         this.runeRepo = runeRepo;
         this.effectRepo = effectRepo;
+        this.eventBus = b;
         
         effects.setItemCaptionGenerator(Effect::getName);
         
@@ -87,7 +85,6 @@ public class RunesEditor extends VerticalLayout {
         binder.setBean(rune);
         
         // Configure and style components
-//        setSpacing(true);
         actions.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         save.setStyleName(ValoTheme.BUTTON_PRIMARY);
         save.setClickShortcut(ShortcutAction.KeyCode.ENTER);
@@ -97,21 +94,23 @@ public class RunesEditor extends VerticalLayout {
                 binder.validate();//.writeBean(effect);
                 runeRepo.save(rune);
                 Notification.show("Rune successfully saved");
+
+                eventBus.publish(this, new RunesView.RuneModifiedEvent());
+                
             } catch (Exception e) {
-                e.printStackTrace();
-                Notification.show("Rune could not be saved: " + e.getMessage());
+                Notification.show("Rune could not be saved: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
         });
         
         delete.addClickListener(e -> {
             if (rune.getId() != null) {
                 runeRepo.delete(rune);
+                eventBus.publish(this, new RunesView.RuneModifiedEvent());
             }
         });
             
         setVisible(false);
     }        
-    
     
     public final void editRune(Rune r) {
         log.debug("editRune: r = {}", r);
@@ -136,27 +135,11 @@ public class RunesEditor extends VerticalLayout {
 
         delete.setEnabled(persisted);
         
-        // Bind properties to similarly named fields
-        // Could also use annotation or "manual binding" or programmatically
-        // moving values from fields to entities before saving
         binder.setBean(rune);
 
         setVisible(true);
 
-        // A hack to ensure the whole form is visible
         save.focus();
-    }
-
-    public interface ChangeHandler {
-
-        void onChange();
-    }    
-    
-    public void setChangeHandler(ChangeHandler h) {
-        // ChangeHandler is notified when either save or delete
-        // is clicked
-        save.addClickListener(e -> h.onChange());
-        delete.addClickListener(e -> h.onChange());
     }
 
 }

@@ -1,10 +1,15 @@
 package com.samsonan.ui;
 
+import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventScope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.samsonan.model.Effect;
 import com.samsonan.model.Rune;
@@ -16,32 +21,28 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.VerticalLayout;
 
+/**
+ * Using spring-vaadin event bus to de-couple Grid View and the Form
+ */
 @SpringView(name = RunesView.VIEW_NAME)
 public class RunesView extends VerticalLayout implements View {
 
+    private static final long serialVersionUID = 2385192672086551419L;
+    private static final Logger log = LoggerFactory.getLogger(EffectsView.class);
+    
     public final static String VIEW_NAME = "Runes";
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2385192672086551419L;
-
-    private static final Logger log = LoggerFactory.getLogger(EffectsView.class);
-
     @Autowired
-    private RunesEditor editor;
+    private RunesForm editor;
 
     @Autowired
     private RuneRepository runesRepo;
 
+    @Autowired
+    private EventBus.UIEventBus eventBus;    
+    
     private Grid<Rune> grid = new Grid<>(Rune.class);
-    private Button addNewBtn;
-
-    // tag::listEffects[]
-    void listRunes(String filterText) {
-        grid.setItems(runesRepo.findAll());
-    }
-    // end::listEffects[]
+    private Button addNewBtn = new Button("New Rune");
 
     @PostConstruct
     void init() {
@@ -49,8 +50,6 @@ public class RunesView extends VerticalLayout implements View {
         log.debug("RunesView :: init");
 
         setSizeFull();
-
-        this.addNewBtn = new Button("New Rune");
 
         VerticalLayout mainLayout = new VerticalLayout(addNewBtn, grid, editor);
         addComponent(mainLayout);
@@ -67,29 +66,36 @@ public class RunesView extends VerticalLayout implements View {
         
         grid.addColumn("effectVal");
 
-        // Connect selected Customer to editor or hide if none is selected
-        grid.asSingleSelect().addValueChangeListener(e -> {
-            editor.editRune(e.getValue());
-        });
 
-        // Instantiate and edit new Customer the new button is clicked
+        grid.asSingleSelect().addValueChangeListener(e -> editor.editRune(e.getValue()));
         addNewBtn.addClickListener(e -> editor.editRune(new Rune()));
 
-        // Listen changes made by the editor, refresh data from backend
-        editor.setChangeHandler(() -> {
-            listRunes(null);
-            editor.setVisible(false);
-        });
-
         // Initialize listing
-        listRunes(null);
+        refreshList();
 
         editor.setVisible(false);
+        
+        eventBus.subscribe(this);
     }
 
+    void refreshList() {
+        grid.setItems(runesRepo.findAll());
+    }
+
+    @EventBusListenerMethod(scope = EventScope.UI)
+    public void onRuneModified(RuneModifiedEvent event) {
+        log.debug("RunesView :: onRuneModified event");
+        refreshList();
+        editor.setVisible(false);
+    }
+    
     @Override
     public void enter(ViewChangeEvent event) {
         log.debug("RunesView :: enter");
     }
 
+    static class RuneModifiedEvent implements Serializable {
+        private static final long serialVersionUID = 1L;
+    }
+    
 }
