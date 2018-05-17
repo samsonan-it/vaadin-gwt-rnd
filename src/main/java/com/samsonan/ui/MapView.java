@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.tapio.googlemaps.GoogleMap;
 import com.vaadin.tapio.googlemaps.client.LatLon;
@@ -33,6 +34,7 @@ public class MapView extends VerticalLayout implements View {
     
     private Label latLbl; 
     private Label lonLbl; 
+    private Window mapToolBox;
     
     public final static String VIEW_NAME = "Map";
     
@@ -67,14 +69,14 @@ public class MapView extends VerticalLayout implements View {
     }
     
     private void initFloatingwindow() {
-        Window mapToolBox = new Window("Map Tool Box");
+        mapToolBox = new Window("Map Tool Box");
         mapToolBox.setClosable(false);
         mapToolBox.setResizable(false);
         mapToolBox.setPosition(10, 100);
         mapToolBox.setWidth("350px");
         mapToolBox.setHeight("250px");
         mapToolBox.addStyleName("mywindowstyle");
-        UI.getCurrent().addWindow(mapToolBox);        
+        UI.getCurrent().addWindow(mapToolBox);      
 
         VerticalLayout toolLayout = new VerticalLayout();
         toolLayout.setMargin(true);
@@ -97,5 +99,10 @@ public class MapView extends VerticalLayout implements View {
         toolLayout.addComponent(type);
         toolLayout.addComponent(actions);
     }
-    
+ 
+    @Override
+    public void beforeLeave(ViewBeforeLeaveEvent event) {
+        mapToolBox.close();
+        event.navigate();
+    }
 }

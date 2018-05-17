@@ -15,7 +15,7 @@ public class Effect {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 5, max = 50)
+    @Size(min = 2, max = 50)
     private String name;
 
     @ManyToOne
