@@ -1,10 +1,12 @@
 package com.samsonan.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
@@ -22,6 +24,10 @@ public class Effect {
     @JoinColumn(name="ELEMENT_ID")
     private Element element;
 
+    @Lob
+    @Column(name="IMAGE_CONTENT")
+    private byte[] imageContent;
+    
     public Effect() {
     }
 
@@ -52,6 +58,14 @@ public class Effect {
 
     public void setElement(Element element) {
         this.element = element;
+    }
+
+    public byte[] getImageContent() {
+        return imageContent;
+    }
+
+    public void setImageContent(byte[] imageContent) {
+        this.imageContent = imageContent;
     }
 
     @Override

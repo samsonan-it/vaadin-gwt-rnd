@@ -61,7 +61,7 @@ public class RunesForm extends VerticalLayout {
     @Autowired
     public RunesForm(RuneRepository runeRepo, EffectRepository effectRepo, EventBus.UIEventBus b) {
         
-        log.debug("RunesEditor :: constructor");
+        log.debug("RunesForm :: constructor");
         
         this.runeRepo = runeRepo;
         this.effectRepo = effectRepo;

@@ -9,6 +9,7 @@ CREATE TABLE EFFECT
   ID int PRIMARY KEY auto_increment,
   NAME varchar(255) NOT NULL,
   ELEMENT_ID int,
+  IMAGE_CONTENT blob,
   foreign key (ELEMENT_ID) references ELEMENT (ID)
 );
 

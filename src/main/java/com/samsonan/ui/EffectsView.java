@@ -29,7 +29,7 @@ public class EffectsView extends VerticalLayout implements View {
     public final static String VIEW_NAME = "Effects";
     
     @Autowired
-    private EffectForm editor;
+    private EffectsForm editor;
 
     @Autowired
     private EffectRepository effectRepo;
@@ -62,6 +62,12 @@ public class EffectsView extends VerticalLayout implements View {
             Element element = e.getElement(); 
             return element != null ? element.getName() : "-";
         }).setCaption("Element");
+        
+        grid.addColumn(e -> { 
+            byte [] img = e.getImageContent(); 
+            return img != null ? ("image size " + img.length) : "-";
+        }).setCaption("Image");
+                
         
         grid.asSingleSelect().addValueChangeListener(e -> edit(e.getValue()));
 

@@ -54,8 +54,8 @@ public class VaadinUI extends UI {
         root.setExpandRatio(viewContainer, 1.0f);  
   
         Navigator navigator = new Navigator(this, viewContainer);  
-        navigator.addProvider(viewProvider);  
-
+        navigator.addProvider(viewProvider);
+        navigator.addView("", new EffectsView()); // default view - this way it won't work, but at least there will be no errors
     }
 
     private Button createNavButton(String caption, final String viewName) {  
